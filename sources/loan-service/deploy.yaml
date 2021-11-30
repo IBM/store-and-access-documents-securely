@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loan-acc-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loan-acc-svc
+  template:
+    metadata:
+      labels:
+        app: loan-acc-svc
+    spec:
+      containers:
+      - name: loan-acc-svc
+        image: bkadambi/loan-acc-svc
+        ports:
+        - containerPort: 9080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loan-acc-svc
+  labels:
+    app: loan-acc-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 9080
+      nodePort: 32601
+  selector:
+    app: loan-acc-svc

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+	<display-name>loan-acc-svc</display-name>
+	<servlet>
+		<servlet-name>com.example.loan.rest.LoanApplication</servlet-name>
+		<multipart-config>
+			<max-file-size>35000000</max-file-size> <!--in bytes -->
+			<max-request-size>218018841</max-request-size> <!--in bytes -->
+			<file-size-threshold>0</file-size-threshold> <!--in bytes -->
+		</multipart-config>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>com.example.loan.rest.LoanApplication</servlet-name>
+		<url-pattern>/locker/*</url-pattern>
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>AuthFilter</filter-name>
+		<filter-class>com.example.loan.rest.AuthFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthFilter</filter-name>
+		<url-pattern>/locker/*</url-pattern>
+	</filter-mapping>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>

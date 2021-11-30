@@ -1,0 +1,21 @@
+{
+  "name": "service1",
+  "version": "1.0.0",
+  "description": "Gateway Service",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shikha Maheshwari",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "util": "*",
+    "async": "*",
+    "ibm-verify-sdk": "^2.0.6",
+    "express-session": "*",
+    "http-proxy": "*"
+  }
+}
