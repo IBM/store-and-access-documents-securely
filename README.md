@@ -114,6 +114,8 @@ Run the following command to create authorization policy:
 ibmcloud iam authorization-policy-create cloud-object-storage kms Reader --source-service-instance-id [GUID of Cloud Object Storage Instance]  --target-service-instance-id [GUID of Key-Protect instance]
 ```
 
+Get the root key CRN value using IBM Cloud Dashboard. You can refer to step 5 [here](https://developer.ibm.com/tutorials/encrypt-and-monitor-usage-of-objects-stored-in-ibm-cloud-object-storage/) for more details.
+
 #### 3.2 Configure Security Verify
 
 **Add a custom application**
@@ -227,6 +229,10 @@ Run the following commands to deploy `document-access-service`.
 ```
 
 Ensure that the application is started successfully using the command `oc get pods`. Also make a note of the route using the command `oc get routes`. The route will be provided in the configuration of other microservices requiring integration with `document access service`.
+
+***Create bucket***
+
+Run the API `http://<your_service_route>/create-bucket-kp` on your browser to create bucket in your cloud object storage instance. It will create the bucket with the name provided in `.env`.
 
 #### 4.3 Deploy Approval Service
 
