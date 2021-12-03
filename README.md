@@ -289,7 +289,7 @@ mvn clean install
 oc new-app . --name=loan-service --strategy=docker
 oc start-build loan-service --from-dir=.
 oc logs -f bc/loan-service
-oc expose svc/loan-service
+oc expose service/loan-service
 ```
 
 Ensure that the application is started successfully using the command `oc get pods`. 
@@ -327,7 +327,7 @@ mvn clean install
 oc new-app . --name=savings-service --strategy=docker
 oc start-build savings-service --from-dir=.
 oc logs -f bc/savings-service
-oc expose svc/savings-service
+oc expose service/savings-service
 ```
 
 Ensure that the application is started successfully using the command `oc get pods`. 
