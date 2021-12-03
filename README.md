@@ -280,6 +280,7 @@ Open the file `config.properties` file under `src/main/resources` folder. Update
 documentSvcUrl={{Document Access Service URL}}/upload-file
 dataAccessSvcUrl={{Data Access Service URL}}/DAS/loan-account
 ```
+Now, go back to the directory `<cloned repo parent folder>/sources/savings-service`.
 
 Run the following commands to deploy `Loan account service`.
 ```
@@ -288,10 +289,12 @@ mvn clean install
 oc new-app . --name=loan-service --strategy=docker
 oc start-build loan-service --from-dir=.
 oc logs -f bc/loan-service
-oc expose bc/loan-service
+oc expose svc/loan-service
 ```
 
-Ensure that the application is started successfully using the command `oc get pods`. Also make a note of the route using the command `oc get routes`. The route will be provided in the configuration of other microservices requiring integration with `loan-service`.
+Ensure that the application is started successfully using the command `oc get pods`. 
+
+Make a note of the route to the `loan-service` using the command `oc get routes`. The route will be provided in the configuration of other microservices requiring integration with `loan-service`. 
 
 #### 4.5 Deploy Savings account service
 
@@ -315,6 +318,7 @@ documentSvcUrl={{Document Access Service URL}}/upload-file
 dataAccessSvcUserUrl={{Data Access Service URL}}/DAS/user
 dataAccessSvcSavingUrl={{Data Access Service URL}}/DAS/savings-account
 ```
+Now, go back to the directory `<cloned repo parent folder>/sources/savings-service`.
 
 Run the following commands to deploy `Savings account service`.
 ```
@@ -323,10 +327,11 @@ mvn clean install
 oc new-app . --name=savings-service --strategy=docker
 oc start-build savings-service --from-dir=.
 oc logs -f bc/savings-service
-oc expose bc/savings-service
+oc expose svc/savings-service
 ```
 
-Ensure that the application is started successfully using the command `oc get pods`. Also make a note of the route using the command `oc get routes`. The route will be provided in the configuration of other microservices requiring integration with `savings-service`.
+Ensure that the application is started successfully using the command `oc get pods`. 
+Make a note of the route to the `saving-service` using the command `oc get routes`. The route will be provided in the configuration of other microservices requiring integration with `savings-service`.
 
 #### 4.6 Deploy Frontend Service
 
@@ -380,7 +385,7 @@ If the loan request is approved, it will be visible on user dashboard. User can 
 
 
 ## Summary
-In this code pattern, you saw how a secure storage solution can be implemented on IBM Cloud. In this application, only the authenticated and authorized could access the application using IBM Security Verify. In addition, all the microservices were protected using token introspection with Security Verify. The documents were encrypted using IBM Key Protect and stored securely on IBM Cloud Object Storage.
+In this code pattern, you saw how a secure storage solution can be implemented on IBM Cloud. In this application, only the authenticated and authorized user can access the application using IBM Security Verify. In addition, all the microservices were protected using token introspection with Security Verify. The documents were encrypted using IBM Key Protect and stored securely on IBM Cloud Object Storage.
 
 This solution is applicable to all business processes where documents need to be stored and accessed securely.
 
