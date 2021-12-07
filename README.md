@@ -1,22 +1,22 @@
 
-# Store and access documents securely across services
+# Securely store and share documents  
 
 Data provides a critical foundation for every operation of your organization. Organizations collect a lot of data, including documents, from its customers. It is very important for organizations to have a robust security mechanism to secure sensitive customer documents. In addition to securing these documents using authentication and authorization of application, data should be encrypted and stored in a secure storage.
 
 In the financial services domain, businesses collect, generate and store documents. Customer on-boarding, Loan origination or Know your customer are some common scenarios.
 
-We will consider two processes for this code pattern:  
+This code pattern focusses on the two specific processes in a banking scenario:  
 - Opening of a savings bank account.
 - Loan origination.
 
 The customer submits documents for identification proof and address proof during the opening of a Savings account at a bank. These documents are stored in a shared storage. These documents are verified and approved for the opening of the Savings account. Next, the customer applies for a loan with loan department of the bank. The loan department needs the identification proof and address proof as part of the loan approval process. The customer does not need to re-submit these documents as it has been already submitted during the savings account opening. These documents are accessed from the shared storage by the Loan deparment official for processing the loan application.
 
 This code pattern will demonstrate the following:
-- Deploying a simple `Account Opening` banking application on OpenShift.
+- Deploying a simple `account opening` banking application on OpenShift.
 - How to integrate [Security Verify](https://www.ibm.com/products/verify-saas) with the banking application to provide authentication and authorization for users.
 - How to securely store customer provided documents to [IBM Cloud Object Storage](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-about-cloud-object-storage).
-- Data Encryption using [Key Protect](https://www.ibm.com/cloud/key-protect).
-- Securely access the stored customer documents for a `Loan Approval` process.
+- Data Encryption using [IBM Key Protect for IBM Cloud](https://www.ibm.com/cloud/key-protect).
+- Securely access the stored customer documents for a `loan approval` process.
 
 ![architecture](images/architecture.png)
 
@@ -24,13 +24,13 @@ This code pattern will demonstrate the following:
 1. User(end user/bank official) access the application.
 2. User registration/login to the application.
 3. Front end application accesses.
-- Savings account service to get Savings Account details.
-- Loan account service to apply/get loan account details.
-- Approval service (Bank official) to approve/reject savings account and loan account requests.
-4. The services (Savings Account, Loan Account and Approval) use Data Access Service and Cloud Object Storage services to store/retrieve account details and documents to database and Object Storage.
+- The savings account service to get savings account details.
+- The loan account service to apply/get loan account details.
+- The approval service (bank official) to approve/reject savings account and loan account requests.
+4. The services (savings account, loan account and approval) use data access service and document access service to store/retrieve account details and documents to database and IBM Cloud Object Storage.
 5. Database to store account details.
-6. Object storage to store user documents.
-7. Documents are encrypted in Cloud Object .
+6. IBM Cloud Object Storage to store user documents.
+7. Documents are encrypted in IBM Cloud Object Storage.
 
 ## Prerequisites
 - [IBM Cloud account](https://cloud.ibm.com/)
