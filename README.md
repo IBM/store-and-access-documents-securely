@@ -145,7 +145,7 @@ Then, note down the following endpoints: **authorization_endpoint, token_endpoin
 **Note profile id**
 Note the profile id.It is needed in configuring the front-end gateway service.
 
-![profile-id](./images/profile-id.png).
+![profile-id](./images/profile_id.png).
 
 **Add an API Client**
 - Click on the `API Access` tab on application settings
