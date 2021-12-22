@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,6 +29,8 @@ public class LoanServiceUtil {
 	private static final String COMMA = ",";
 	private static final String COLON = ":";
 	private static final String DOUBLE_QUOTES = "\"";
+	
+	private static Logger logger = Logger.getLogger(LoanServiceUtil.class.getName());
 
 	static {
 		ClassLoader classLoader = LoanServiceUtil.class.getClassLoader();
@@ -35,16 +39,18 @@ public class LoanServiceUtil {
 		try {
 			reader = new FileReader(configFile);
 		} catch (FileNotFoundException e1) {
+			logger.log(Level.SEVERE, "The file config.properties was not found!");
 			e1.printStackTrace();
 		}
 		Properties config = new Properties();
 		try {
 			config.load(reader);
 		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Error loading config.properties!");
 			e.printStackTrace();
 		}
 		dataAccessSvcUrl = config.getProperty("dataAccessSvcUrl");
-		System.out.println(dataAccessSvcUrl);
+		logger.log(Level.INFO, "Data Access Service URL:" + dataAccessSvcUrl);
 	}
 
 	/**
@@ -61,6 +67,7 @@ public class LoanServiceUtil {
 	 */
 	public static boolean createLoanAccount(String user_id, String loan_type, String loan_amount, String tax_id, String income) {
 		CloseableHttpClient httpClient = null;
+		logger.log(Level.INFO, "Create loan account - start");
 		try {
 			
 			Date date = new Date();  
@@ -88,15 +95,18 @@ public class LoanServiceUtil {
 			CloseableHttpResponse response = httpClient.execute(post);
 
 			result = EntityUtils.toString(response.getEntity());
-			System.out.println(result);
+			logger.log(Level.INFO,result);
+			logger.log(Level.INFO, "Create loan account - End");
 
 		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Error creating loan account!");
 			e.printStackTrace();
 			return false;
 		} finally {
 			try {
 				httpClient.close();
 			} catch (IOException e) {
+				logger.log(Level.SEVERE, "Error closing connection!");
 				e.printStackTrace();
 				return false;
 			}
@@ -106,6 +116,8 @@ public class LoanServiceUtil {
 
 	public static String getCustomerDetails(String userid) {
 		StringBuffer textView = new StringBuffer();
+		logger.log(Level.INFO, "Get loan account details - start");
+		
 		try {
 			HttpClient client = HttpClients.createDefault();
 			HttpGet request = new HttpGet(dataAccessSvcUrl + "/" + userid);
@@ -121,9 +133,11 @@ public class LoanServiceUtil {
 			}
 
 		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Error getting loan details!");
 			e.printStackTrace();
+			return null;
 		}
-		System.out.println(textView);
+		logger.log(Level.INFO, textView.toString());
 		return textView.toString();
 	}
 

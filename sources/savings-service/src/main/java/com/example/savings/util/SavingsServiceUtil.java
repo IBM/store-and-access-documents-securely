@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,6 +29,7 @@ public class SavingsServiceUtil {
 	private static final String DOUBLE_QUOTES = "\"";
 	private static final String dataAccessSvcUserUrl;
 	private static final String dataAccessSvcSavingUrl;
+	private static Logger logger = Logger.getLogger(SavingsServiceUtil.class.getName());
 
 	static {
 		ClassLoader classLoader = SavingsServiceUtil.class.getClassLoader();
@@ -35,18 +38,20 @@ public class SavingsServiceUtil {
 		try {
 			reader = new FileReader(configFile);
 		} catch (FileNotFoundException e1) {
+			logger.log(Level.SEVERE, "The file config.properties was not found!");
 			e1.printStackTrace();
 		}
 		Properties config = new Properties();
 		try {
 			config.load(reader);
 		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Error loading config.properties!");
 			e.printStackTrace();
 		}
 		dataAccessSvcUserUrl = config.getProperty("dataAccessSvcUserUrl");
-		System.out.println(dataAccessSvcUserUrl);
+		logger.log(Level.INFO, "Data Access Service User URL:" + dataAccessSvcUserUrl);
 		dataAccessSvcSavingUrl = config.getProperty("dataAccessSvcSavingUrl");
-		System.out.println(dataAccessSvcSavingUrl);
+		logger.log(Level.INFO, "Document Access Service Saving URL:" + dataAccessSvcSavingUrl);
 	}
 
 	/**
@@ -63,20 +68,27 @@ public class SavingsServiceUtil {
 	 */
 	public static boolean createUser(String user_id, String first_name, String last_name, String mobile_no,
 			String address, String email_id) {
+		logger.log(Level.INFO, "Create user for Savings account - start");
 		CloseableHttpClient httpClient = null;
 		try {
 			StringBuffer dataBuffer = new StringBuffer();
 			dataBuffer.append("{");
-			dataBuffer.append(DOUBLE_QUOTES + "user_id"+DOUBLE_QUOTES+COLON+DOUBLE_QUOTES+user_id+DOUBLE_QUOTES+COMMA);
-			dataBuffer.append(DOUBLE_QUOTES+"first_name"+DOUBLE_QUOTES+COLON+DOUBLE_QUOTES+first_name+DOUBLE_QUOTES+COMMA);
-			dataBuffer.append(DOUBLE_QUOTES+"last_name"+DOUBLE_QUOTES+COLON+DOUBLE_QUOTES+last_name+DOUBLE_QUOTES+COMMA);
-			dataBuffer.append(DOUBLE_QUOTES+"mobile_no"+DOUBLE_QUOTES+COLON+DOUBLE_QUOTES+mobile_no+DOUBLE_QUOTES+COMMA);
-			dataBuffer.append(DOUBLE_QUOTES+"address"+DOUBLE_QUOTES+COLON+DOUBLE_QUOTES+address+DOUBLE_QUOTES+COMMA);
-			dataBuffer.append(DOUBLE_QUOTES+"email_id"+DOUBLE_QUOTES+COLON+DOUBLE_QUOTES+email_id+DOUBLE_QUOTES);
+			dataBuffer.append(DOUBLE_QUOTES + "user_id" + DOUBLE_QUOTES + COLON + DOUBLE_QUOTES + user_id
+					+ DOUBLE_QUOTES + COMMA);
+			dataBuffer.append(DOUBLE_QUOTES + "first_name" + DOUBLE_QUOTES + COLON + DOUBLE_QUOTES + first_name
+					+ DOUBLE_QUOTES + COMMA);
+			dataBuffer.append(DOUBLE_QUOTES + "last_name" + DOUBLE_QUOTES + COLON + DOUBLE_QUOTES + last_name
+					+ DOUBLE_QUOTES + COMMA);
+			dataBuffer.append(DOUBLE_QUOTES + "mobile_no" + DOUBLE_QUOTES + COLON + DOUBLE_QUOTES + mobile_no
+					+ DOUBLE_QUOTES + COMMA);
+			dataBuffer.append(DOUBLE_QUOTES + "address" + DOUBLE_QUOTES + COLON + DOUBLE_QUOTES + address
+					+ DOUBLE_QUOTES + COMMA);
+			dataBuffer.append(
+					DOUBLE_QUOTES + "email_id" + DOUBLE_QUOTES + COLON + DOUBLE_QUOTES + email_id + DOUBLE_QUOTES);
 			dataBuffer.append("}");
-			
-		    String postData = dataBuffer.toString();
-			
+
+			String postData = dataBuffer.toString();
+
 			System.out.println(postData);
 			String result = "";
 			HttpPost post = new HttpPost(dataAccessSvcUserUrl);
@@ -88,15 +100,17 @@ public class SavingsServiceUtil {
 			CloseableHttpResponse response = httpClient.execute(post);
 
 			result = EntityUtils.toString(response.getEntity());
-			System.out.println(result);
-
+			logger.log(Level.INFO, "Result from Data Access Service: " + result);
+			logger.log(Level.INFO, "Create user for Savings account - end");
 		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Error creating user.");
 			e.printStackTrace();
 			return false;
 		} finally {
 			try {
 				httpClient.close();
 			} catch (IOException e) {
+				logger.log(Level.SEVERE, "Error closing connection.");
 				e.printStackTrace();
 				return false;
 			}
@@ -107,6 +121,8 @@ public class SavingsServiceUtil {
 	public static String getCustomerDetails(String userid) {
 		StringBuffer textView = new StringBuffer();
 		JSONObject savings = null;
+		logger.log(Level.INFO, "Get user for Savings account - start");
+
 		try {
 			HttpClient client = HttpClients.createDefault();
 			HttpGet request = new HttpGet(dataAccessSvcUserUrl + "/" + userid);
@@ -119,35 +135,37 @@ public class SavingsServiceUtil {
 			while ((line = rd.readLine()) != null) {
 				textView.append(line);
 			}
-			System.out.println("Savings account details - "+ textView);
+			logger.log(Level.INFO,"Savings account details  - " + textView);
 			savings = new JSONObject(textView.toString());
-			
+
 			client = HttpClients.createDefault();
 			request = new HttpGet(dataAccessSvcSavingUrl + "/" + userid);
 			response = client.execute(request);
 
 			// Get the response
 			rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-			
+
 			line = "";
 			StringBuffer temp = new StringBuffer();
 			while ((line = rd.readLine()) != null) {
 				temp.append(line);
 			}
-			System.out.println("Loan account there or not - "+ temp);
+			logger.log(Level.INFO, "Loan account exists? - " + temp);
 			JSONObject loan = new JSONObject(temp.toString());
-			System.out.println(loan.toString());
+			logger.log(Level.INFO, loan.toString());
 			Iterator keysIterator = loan.keySet().iterator();
 			while (keysIterator.hasNext()) {
-			   String key = keysIterator.next().toString();
-			   savings.put(key, loan.get(key));
+				String key = keysIterator.next().toString();
+				savings.put(key, loan.get(key));
 			}
-			
+			logger.log(Level.INFO, "Get user for Savings account - end");
 
 		} catch (Exception e) {
+			logger.log(Level.SEVERE,"Error getting customer details!");
 			e.printStackTrace();
+			return null;
 		}
-		System.out.println(savings.toString());
+		logger.log(Level.INFO,savings.toString());
 		return savings.toString();
 	}
 

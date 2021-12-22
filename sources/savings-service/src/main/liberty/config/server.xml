@@ -16,7 +16,7 @@
 	<ssl id="defaultSSLConfig" trustDefaultCerts="true" />
 
 	<!-- tracing that is useful, no need to set it unless debugging -->
-	<logging traceSpecification="*=info" />
+	<logging consoleLogLevel="INFO" traceSpecification="*=info" />
 	<!-- Automatically expand WAR files and EAR files -->
 	<applicationManager autoExpand="true" />
 

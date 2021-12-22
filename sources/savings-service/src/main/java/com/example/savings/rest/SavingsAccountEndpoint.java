@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
@@ -24,16 +26,19 @@ import com.example.savings.util.UploadFileThread;
 @Path("savings")
 @RequestScoped
 public class SavingsAccountEndpoint {
+	
+	private static Logger logger = Logger.getLogger(SavingsAccountEndpoint.class.getName());
 
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public Response createSavingsAccount(@javax.ws.rs.core.Context javax.servlet.http.HttpServletRequest request) {
+		boolean successFlag = true;
 		try {
 			String userid = request.getParameter("userid");
-			System.out.println("Create Savings Account....");
-			System.out.println("User ID:"+userid);
-			System.out.println("Files:" + request.getParts().size());
+			logger.log(Level.INFO,"Savings account creation endpoint - start");
+			logger.log(Level.INFO,"User ID:"+userid);
+			logger.log(Level.INFO, "Number of parts in the request:" + request.getParts().size());
 			javax.servlet.http.Part idprooffile = request.getPart("taxidfile");
 			javax.servlet.http.Part addressprooffile = request.getPart("nationalidfile");
 	
@@ -41,7 +46,7 @@ public class SavingsAccountEndpoint {
 			String extension = FilenameUtils.getExtension(idprooffile.getSubmittedFileName());
 			File idtargetFile = new File(userid+"-"+"taxid"+"."+extension);
 		    OutputStream idOutStream = new FileOutputStream(idtargetFile);
-			System.out.println("Writing taxid file on Server first");
+			logger.log(Level.INFO,"Storing tax id file on Server first");
 			  
 		    byte[] buffer = new byte[8 * 1024];
 		    int bytesRead;
@@ -56,7 +61,7 @@ public class SavingsAccountEndpoint {
 		    extension = FilenameUtils.getExtension(addressprooffile.getSubmittedFileName());
 			File addresstargetFile = new File(userid+"-"+"nationalid"+"."+extension);
 		    OutputStream addressOutStream = new FileOutputStream(addresstargetFile);
-			System.out.println("Writing nationalid file on Server first");
+			logger.log(Level.INFO,"Storing nationalid file on Server first");
 			
 		    while ((bytesRead = addressInitialStream.read(buffer)) != -1) {
 		        addressOutStream.write(buffer, 0, bytesRead);
@@ -66,16 +71,16 @@ public class SavingsAccountEndpoint {
 		    addressOutStream.close();
 			
 			// Create a record with account pending status on RDBMS
-			SavingsServiceUtil.createUser(request.getParameter("userid"), request.getParameter("firstname"),request.getParameter("lastname"),
+			successFlag = SavingsServiceUtil.createUser(request.getParameter("userid"), request.getParameter("firstname"),request.getParameter("lastname"),
 					request.getParameter("mobilenumber"), request.getParameter("address"), request.getParameter("emailid"));
 	
-			System.out.println("Uploading taxid file to COS. Calling COS service");
+			logger.log(Level.INFO,"Uploading taxid file to COS. Calling COS service");
 			
 		    UploadFileThread uploadTaxId = new UploadFileThread(idtargetFile);
 		    Thread uploadTaxIdThread = new Thread(uploadTaxId);
 			uploadTaxIdThread.start();
 			
-			System.out.println("Uploading nationalid file to COS. Calling COS service");
+			logger.log(Level.INFO,"Uploading nationalid file to COS. Calling COS service");
 			
 			UploadFileThread uploadNationalId = new UploadFileThread(addresstargetFile);
 		    Thread uploadNationalIdThread = new Thread(uploadNationalId);
@@ -83,18 +88,25 @@ public class SavingsAccountEndpoint {
 			
 	
 		} catch (Exception e) {
+			successFlag = false;
 			e.printStackTrace();
+			logger.log(Level.SEVERE,"Error creating user!");
 		}
+		
+		if (!successFlag)
+			return Response.status(500).entity("Error creating user. Please check server logs.").build();
 		return Response.ok("{\"message\":\"Savings account created\"}").build();
 	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCustomerDetails(@javax.ws.rs.core.Context javax.servlet.http.HttpServletRequest request) {
-		System.out.println("Got request : "+request.getParameter("userid")+ " "+request.getRemoteAddr() + " " +request.getRequestURL());
+		logger.log(Level.INFO,"Got request : "+request.getParameter("userid")+ " "+request.getRemoteAddr() + " " +request.getRequestURL());
 		String userDetails = SavingsServiceUtil.getCustomerDetails(request.getParameter("userid"));
 		
-	    return Response.ok(userDetails).build();
+		if (userDetails == null)
+			return Response.status(500).entity("Error getting user. Please check server logs.").build();
+		return Response.ok(userDetails).build();
 	}
 
 }

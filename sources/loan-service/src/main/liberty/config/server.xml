@@ -11,6 +11,10 @@
 
 	<httpEndpoint id="defaultHttpEndpoint" httpPort="${PORT}"
 		httpsPort="${default.https.port}" host="*" />
+		
+		<!-- tracing that is useful, no need to set it unless debugging -->
+	<logging consoleLogLevel="INFO" traceSpecification="*=info" />
+	
 
 	<ssl id="defaultSSLConfig" trustDefaultCerts="true" />
 
