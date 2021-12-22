@@ -29,289 +29,273 @@ import com.example.verify.operations.UsersSvc;
 @Path("account")
 public class ApprovalFlowController {
 
-	
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/test")
-    public Response test() {
-    	CloseableHttpClient httpClient = null;
-    	try {
-    		HttpGet get = new HttpGet("https://reqres.in/api/users/2");
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/savings/pendinglist")
+	public Response getPendingSavingsAccounts() {
+		System.out.println("In get pending savings list");
+		CloseableHttpClient httpClient = null;
+		try {
+			String url = Config.getPendingSAPath();
+			System.out.println("URL = " + url);
 
-    		get.setHeader("Accept", "application/json");
-    		get.setHeader("Content-type", "application/json");
+			HttpGet get = new HttpGet(url);
 
-    		httpClient = HttpClients.createDefault();
-    		CloseableHttpResponse response = httpClient.execute(get);
+			get.setHeader("Accept", "application/json");
+			get.setHeader("Content-type", "application/json");
+			get.setHeader("Access-Control-Allow-Origin", "*");
 
-    		return Response.ok(response.getEntity(), MediaType.APPLICATION_JSON).build();
-    		
-    	}catch (Exception e) {
-    		e.printStackTrace();
-    		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build(); 
+			httpClient = HttpClients.createDefault();
+			CloseableHttpResponse response = httpClient.execute(get);
+			String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+			// System.out.println("response = " + responseString);
+			System.out.println("Savings pending list returned");
+			return Response.ok(responseString, MediaType.APPLICATION_JSON)
+					.header("Access-Control-Allow-Origin", "*")
+					.header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+					.header("Access-Control-Allow-Credentials", "true")
+					.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage())
+					.header("Access-Control-Allow-Origin", "*").build();
 		}
 
-    }
-    
-    
+	}
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/savings/pendinglist")
-    public Response getPendingSavingsAccounts() {
-    	System.out.println("In get pending savings list");
-    	CloseableHttpClient httpClient = null;
-    	try {
-    	    String url = Config.getPendingSAPath();
-    	    System.out.println("URL = " + url);
-    	    
-    		HttpGet get = new HttpGet(url);
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/loan/pendinglist")
+	public Response getPendingLoanAccounts() {
+		System.out.println("In get pending loan list");
+		CloseableHttpClient httpClient = null;
+		try {
+			String url = Config.getPendingLAPath();
 
-    		get.setHeader("Accept", "application/json");
-    		get.setHeader("Content-type", "application/json");
-    		get.setHeader("Access-Control-Allow-Origin", "*");
+			HttpGet get = new HttpGet(url);
 
-    		httpClient = HttpClients.createDefault();
-    		CloseableHttpResponse response = httpClient.execute(get);
-    		String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
-    	    //System.out.println("response = " + responseString);
-    		System.out.println("Savings pending list returned");
-    		return Response.ok(responseString, MediaType.APPLICATION_JSON)
-    				.header("Access-Control-Allow-Origin", "*")
-    	            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-    	            .header("Access-Control-Allow-Credentials", "true")
-    	            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
-    		
-    	}catch (Exception e) {
-    		e.printStackTrace();
-    		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build(); 
+			get.setHeader("Accept", "application/json");
+			get.setHeader("Content-type", "application/json");
+
+			httpClient = HttpClients.createDefault();
+			CloseableHttpResponse response = httpClient.execute(get);
+			String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+			System.out.println("returned pending loan list");
+
+			return Response.ok(responseString, MediaType.APPLICATION_JSON)
+					.header("Access-Control-Allow-Origin", "*")
+					.header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+					.header("Access-Control-Allow-Credentials", "true")
+					.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage())
+					.header("Access-Control-Allow-Origin", "*").build();
 		}
 
-    }
-    
-    
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/loan/pendinglist")
-    public Response getPendingLoanAccounts() {
-    	System.out.println("In get pending loan list");
-    	CloseableHttpClient httpClient = null;
-    	try {
-    	    String url = Config.getPendingLAPath();
-    	    
-    		HttpGet get = new HttpGet(url);
+	}
 
-    		get.setHeader("Accept", "application/json");
-    		get.setHeader("Content-type", "application/json");
+	// @PUT
+	// @Consumes(MediaType.APPLICATION_JSON)
+	// @Path("/savings/status")
+	// public Response updateSavingsAccountStatus(HashMap<String, String> payload) {
+	// System.out.println("In update savings account status");
+	// String responseMessage = "";
+	// try {
+	// SavingsAccountVO saVO = new SavingsAccountVO(payload,
+	// OperationType.updateSA);
+	// // create user in Security Verify
+	// int resp = UsersSvc.createUser(saVO.getUserid(), saVO.getLastName(),
+	// saVO.getFirstName(), saVO.getEmailId(),
+	// saVO.getMobileNo());
+	// if (resp != 200 && resp != 201)
+	// throw new Exception("User was not created in security verify");
+	// responseMessage = responseMessage + "User created successfully in Security
+	// Verify. ";
+	// // update account status
+	// updateSAStatus(saVO);
+	// responseMessage = responseMessage + "User savings account status successfully
+	// in database. ";
 
-    		httpClient = HttpClients.createDefault();
-    		CloseableHttpResponse response = httpClient.execute(get);
-    		String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
-    		System.out.println("returned pending loan list");
+	// System.out.println("Savings account status updated");
 
-    		return Response.ok(responseString, MediaType.APPLICATION_JSON)
-    				.header("Access-Control-Allow-Origin", "*")
-    	            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-    	            .header("Access-Control-Allow-Credentials", "true")
-    	            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
-    		
-    	}catch (Exception e) {
-    		e.printStackTrace();
-    		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build(); 
+	// return Response.ok(responseMessage, MediaType.APPLICATION_JSON)
+	// .header("Access-Control-Allow-Origin", "*")
+	// .header("Access-Control-Allow-Headers", "origin, content-type, accept,
+	// authorization")
+	// .header("Access-Control-Allow-Credentials", "true")
+	// .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS,
+	// HEAD").build();
+
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage())
+	// .header("Access-Control-Allow-Origin", "*").build();
+	// }
+	// }
+
+	// @PUT
+	// @Consumes(MediaType.APPLICATION_JSON)
+	// @Path("/loan/status")
+	// public Response updateLoanAccountStatus(HashMap<String, String> payload) {
+	// System.out.println("In loan account status update");
+	// CloseableHttpClient httpClient = null;
+	// try {
+	// System.out.println("payload = " + payload.toString());
+	// LoanAccountVO laVO = new LoanAccountVO(payload, OperationType.updateLA);
+
+	// String url = Config.getLAURL() + "/" + laVO.getUserid();
+	// HttpPut put = new HttpPut(url);
+	// put.setEntity(new StringEntity(laVO.toJSON().toString()));
+
+	// put.setHeader("Accept", "application/json");
+	// put.setHeader("Content-type", "application/json");
+
+	// httpClient = HttpClients.createDefault();
+	// CloseableHttpResponse response = httpClient.execute(put);
+	// String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+	// System.out.println("Loan account status updated");
+
+	// return Response.ok(responseString, MediaType.APPLICATION_JSON)
+	// .header("Access-Control-Allow-Origin", "*")
+	// .header("Access-Control-Allow-Headers", "origin, content-type, accept,
+	// authorization")
+	// .header("Access-Control-Allow-Credentials", "true")
+	// .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS,
+	// HEAD").build();
+
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage())
+	// .header("Access-Control-Allow-Origin", "*").build();
+	// }
+	// }
+
+	@GET
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/savings/status")
+	public Response updateSavingsAccountStatusGET(@QueryParam("user_id") String userId,
+			@QueryParam("last_name") String lastName,
+			@QueryParam("first_name") String firstName, @QueryParam("email_id") String emailId,
+			@QueryParam("mobile_no") String mobileNo,
+			@QueryParam("status") String status) {
+		System.out.println("In update savings account status");
+		System.out.println("userId = " + userId);
+		System.out.println("lastName = " + lastName);
+		System.out.println("firstName = " + firstName);
+		System.out.println("emailId = " + emailId);
+		System.out.println("mobileNo = " + mobileNo);
+		System.out.println("status = " + status);
+		String responseMessage = "";
+		try {
+			// SavingsAccountVO saVO = new SavingsAccountVO(payload,
+			// OperationType.updateSA);
+			SavingsAccountVO saVO = new SavingsAccountVO();
+			saVO.setUserid(userId);
+			saVO.setLastName(lastName);
+			saVO.setFirstName(firstName);
+			saVO.setMobileNo(mobileNo);
+			saVO.setEmailId(emailId);
+			saVO.setStatus(status);
+			saVO.setOpType(OperationType.updateSA);
+
+			// create user in Security Verify
+			if (status.toLowerCase().equals("approved") || status.toLowerCase().equals("approve")) {
+				int resp = UsersSvc.createUser(saVO.getUserid(), saVO.getLastName(), saVO.getFirstName(),
+						saVO.getEmailId(), saVO.getMobileNo());
+				if (resp != 200 && resp != 201) {
+					System.out.println("User was not created in security verify");
+					throw new Exception("User was not created in security verify");
+				}
+				responseMessage = responseMessage + "User created successfully in Security Verify. ";
+			}
+			// update account status
+			updateSAStatus(saVO);
+			responseMessage = responseMessage + "User savings account status successfully in database. ";
+
+			System.out.println("Savings account status updated");
+
+			return Response.ok(responseMessage, MediaType.APPLICATION_JSON)
+					.header("Access-Control-Allow-Origin", "*")
+					.header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+					.header("Access-Control-Allow-Credentials", "true")
+					.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage())
+					.header("Access-Control-Allow-Origin", "*").build();
 		}
+	}
 
-    }
-    
-    
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/savings/status")
-    public Response updateSavingsAccountStatus(HashMap<String, String> payload) {
-    	System.out.println("In update savings account status");
-    	String responseMessage = "";
-    	try {
-        	SavingsAccountVO saVO = new SavingsAccountVO(payload, OperationType.updateSA);
-    		// create user in Security Verify
-        	int resp = UsersSvc.createUser(saVO.getUserid(), saVO.getLastName(), saVO.getFirstName(), saVO.getEmailId(), saVO.getMobileNo());
-        	if(resp != 200 && resp != 201 ) throw new Exception("User was not created in security verify");
-        	responseMessage = responseMessage + "User created successfully in Security Verify. ";
-        	// update account status
-        	updateSAStatus(saVO);
-        	responseMessage = responseMessage + "User savings account status successfully in database. ";
-        	
-        	System.out.println("Savings account status updated");
+	@GET
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/loan/status")
+	public Response updateLoanAccountStatusGET(@QueryParam("user_id") String userId,
+			@QueryParam("status") String status,
+			@QueryParam("approver_id") String approverId, @QueryParam("reject_reason") String rejectReason) {
 
-    		
-        	return Response.ok(responseMessage, MediaType.APPLICATION_JSON)
-    				.header("Access-Control-Allow-Origin", "*")
-    	            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-    	            .header("Access-Control-Allow-Credentials", "true")
-    	            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
-        	
-    	}catch (Exception e) {
-    		e.printStackTrace();
-    		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build(); 
+		System.out.println("In loan account status update");
+		System.out.println("userId = " + userId);
+		System.out.println("status = " + status);
+		System.out.println("approverId = " + approverId);
+		System.out.println("rejectReason = " + rejectReason);
+
+		CloseableHttpClient httpClient = null;
+		try {
+			// LoanAccountVO laVO = new LoanAccountVO(payload, OperationType.updateLA);
+			LoanAccountVO laVO = new LoanAccountVO();
+			if (userId == null || status == null) {
+				throw new Exception("Either userid or status is not provided");
+			}
+			laVO.setUserid(userId);
+			laVO.setStatus(status);
+			if (approverId != null) {
+				laVO.setApproverId(approverId);
+			}
+			if (rejectReason != null) {
+				laVO.setRejectReason(rejectReason);
+			}
+
+			String url = Config.getLAURL() + "/" + laVO.getUserid();
+			HttpPut put = new HttpPut(url);
+			put.setEntity(new StringEntity(laVO.toJSON().toString()));
+
+			put.setHeader("Accept", "application/json");
+			put.setHeader("Content-type", "application/json");
+
+			httpClient = HttpClients.createDefault();
+			CloseableHttpResponse response = httpClient.execute(put);
+			String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+			System.out.println("Loan account status updated successfully");
+
+			return Response.ok(responseString, MediaType.APPLICATION_JSON)
+					.header("Access-Control-Allow-Origin", "*")
+					.header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+					.header("Access-Control-Allow-Credentials", "true")
+					.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage())
+					.header("Access-Control-Allow-Origin", "*").build();
 		}
-    }
-    
-    
-    
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/loan/status")
-    public Response updateLoanAccountStatus(HashMap<String, String> payload) {
-    	System.out.println("In loan account status update");
-    	CloseableHttpClient httpClient = null;
-    	try {
-    		System.out.println("payload = " + payload.toString());
-        	LoanAccountVO laVO = new LoanAccountVO(payload, OperationType.updateLA);
-        	
-    		String url = Config.getLAURL() + "/" + laVO.getUserid();
-    		HttpPut put = new HttpPut(url);
-    		put.setEntity(new StringEntity(laVO.toJSON().toString()));
+	}
 
-    		put.setHeader("Accept", "application/json");
-    		put.setHeader("Content-type", "application/json");
-
-    		httpClient = HttpClients.createDefault();
-    		CloseableHttpResponse response = httpClient.execute(put);
-    		String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
-    		System.out.println("Loan account status updated");
-    		
-    		
-    		return Response.ok(responseString, MediaType.APPLICATION_JSON)
-    				.header("Access-Control-Allow-Origin", "*")
-    	            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-    	            .header("Access-Control-Allow-Credentials", "true")
-    	            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
-
-
-    	}catch (Exception e) {
-    		e.printStackTrace();
-    		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build(); 
-		}
-    }
-    
-    
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/savings/status")
-    public Response updateSavingsAccountStatusGET(@QueryParam("user_id") String userId, @QueryParam("last_name") String lastName, 
-    		@QueryParam("first_name") String firstName, @QueryParam("email_id") String emailId, @QueryParam("mobile_no") String mobileNo, 
-    		@QueryParam("status") String status) {
-    	System.out.println("In update savings account status");
-    	System.out.println("userId = " + userId);
-    	System.out.println("lastName = " + lastName);
-    	System.out.println("firstName = " + firstName);
-    	System.out.println("emailId = " + emailId);
-    	System.out.println("mobileNo = " + mobileNo);
-    	System.out.println("status = " + status);
-    	String responseMessage = "";
-    	try {
-        	//SavingsAccountVO saVO = new SavingsAccountVO(payload, OperationType.updateSA);
-    		SavingsAccountVO saVO = new SavingsAccountVO();
-    		saVO.setUserid(userId);
-    		saVO.setLastName(lastName);
-    		saVO.setFirstName(firstName);
-    		saVO.setMobileNo(mobileNo);
-    		saVO.setEmailId(emailId);
-    		saVO.setStatus(status);
-    		saVO.setOpType(OperationType.updateSA);
-    		
-    		// create user in Security Verify
-        	int resp = UsersSvc.createUser(saVO.getUserid(), saVO.getLastName(), saVO.getFirstName(), saVO.getEmailId(), saVO.getMobileNo());
-        	if(resp != 200 && resp != 201 ) {
-        		System.out.println("User was not created in security verify");
-        		throw new Exception("User was not created in security verify");
-        	}
-        	responseMessage = responseMessage + "User created successfully in Security Verify. ";
-        	// update account status
-        	updateSAStatus(saVO);
-        	responseMessage = responseMessage + "User savings account status successfully in database. ";
-        	
-        	System.out.println("Savings account status updated");
-
-    		
-        	return Response.ok(responseMessage, MediaType.APPLICATION_JSON)
-    				.header("Access-Control-Allow-Origin", "*")
-    	            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-    	            .header("Access-Control-Allow-Credentials", "true")
-    	            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
-        	
-    	}catch (Exception e) {
-    		e.printStackTrace();
-    		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build(); 
-		}
-    }
-    
-    
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/loan/status")
-    public Response updateLoanAccountStatusGET(@QueryParam("user_id") String userId, @QueryParam("status") String status, 
-    		@QueryParam("approver_id") String approverId, @QueryParam("reject_reason") String rejectReason) {
-    	
-    	System.out.println("In loan account status update");
-    	System.out.println("userId = " + userId);
-    	System.out.println("status = " + status);
-    	System.out.println("approverId = " + approverId);
-    	System.out.println("rejectReason = " + rejectReason);
-    	
-    	CloseableHttpClient httpClient = null;
-    	try {
-        	//LoanAccountVO laVO = new LoanAccountVO(payload, OperationType.updateLA);
-    		LoanAccountVO laVO = new LoanAccountVO();
-    		if( userId == null || status == null ) {
-    			throw new Exception("Either userid or status is not provided");
-    		}
-    		laVO.setUserid(userId);
-    		laVO.setStatus(status);
-    		if(approverId != null ) {
-        		laVO.setApproverId(approverId);
-    		}
-    		if( rejectReason != null ) {
-        		laVO.setRejectReason(rejectReason);
-    		}
-        	
-    		String url = Config.getLAURL() + "/" + laVO.getUserid();
-    		HttpPut put = new HttpPut(url);
-    		put.setEntity(new StringEntity(laVO.toJSON().toString()));
-
-    		put.setHeader("Accept", "application/json");
-    		put.setHeader("Content-type", "application/json");
-
-    		httpClient = HttpClients.createDefault();
-    		CloseableHttpResponse response = httpClient.execute(put);
-    		String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
-    		System.out.println("Loan account status updated successfully");
-    		
-    		
-    		return Response.ok(responseString, MediaType.APPLICATION_JSON)
-    				.header("Access-Control-Allow-Origin", "*")
-    	            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-    	            .header("Access-Control-Allow-Credentials", "true")
-    	            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
-
-
-    	}catch (Exception e) {
-    		e.printStackTrace();
-    		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build(); 
-		}
-    }
-    
-    private void updateSAStatus(SavingsAccountVO saVO) throws Exception{
-    	CloseableHttpClient httpClient = null;
+	private void updateSAStatus(SavingsAccountVO saVO) throws Exception {
+		CloseableHttpClient httpClient = null;
 
 		String url = Config.getSAURL() + "/" + saVO.getUserid();
 		HttpPut put = new HttpPut(url);
 		put.setEntity(new StringEntity(saVO.toJSON().toString()));
-		
+
 		put.setHeader("Accept", "application/json");
 		put.setHeader("Content-type", "application/json");
 
 		httpClient = HttpClients.createDefault();
 		httpClient.execute(put);
-    }
-    
-    
+	}
+
 }
