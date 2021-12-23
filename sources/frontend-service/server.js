@@ -5,8 +5,6 @@ const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
 var multer = require('multer');
-// var upload = multer({ dest: 'uploads/'});
-// const request = require('request');
 const fs = require('fs');
 
 
@@ -23,8 +21,8 @@ const config = {
 
 // var bodyParser = require('body-parser');
 var {OAuthContext} = require('ibm-verify-sdk');
-const { timeEnd } = require('console');
-const { nextTick } = require('process');
+// const { timeEnd } = require('console');
+// const { nextTick } = require('process');
 var authClient = new OAuthContext(config);
 
 const port = process.env.PORT || 3001;
@@ -84,74 +82,91 @@ app.get('/redirect', (req, res) => {
 });
 
 
-app.get("/api", (req, res) => {
-    console.log("/api");
-	console.log(path.join(__dirname+'/ui-react/build/index.html'));
-    if(req.session.token){
-		console.log('======== Requesting userInfo claims using valid token');
-		authClient.userInfo(req.session.token)
-			.then((response) => {
-                res.set('Access-Control-Allow-Origin', '*');
-                res.json({ message: "Hello from redirected /api server!" });
-				//res.render('dashboard', {userInfo :response.response});
-			}).catch((err) => {
-				res.json(err);
-			});
-	} else {
-		console.log('======== Current session had no token available.')
-		res.redirect('/')
-	}
-});
-
 //Pending list of Savings Account
 app.get('/pendingSavingsAccount', (req, res) => {
 	console.log("/pendingSavingsAccount");
 	const URL = process.env.APPROVAL_SERVICE_URL + '/approval-flow/account/savings/pendinglist';
-	axios.get(URL)
-	.then( function (response) {
-		console.log(response.data);
-		res.send(response.data);
-	})
-	.catch (function (error) {
-		console.log(error);
-	});
-	// res.json({"message": "hello"});
-
-	// await fetch("http://approval-service-approval-proj.cp4i-errortest-dal10-c3-f2c6cdc6801be85fd188b09d006f13e3-0000.us-south.containers.appdomain.cloud/approval-flow/account/savings/pendinglist", { method: "get" })
+	
+	if(req.session.token) {	
+		var token = 'Bearer ' + req.session.token["access_token"];
+		var config = {
+			method: 'get',
+			url: URL,
+			headers: { 
+			  'Authorization': token
+			}
+		  };
+		axios(config)
+		.then( function (response) {
+			console.log(response.data);
+			res.send(response.data);
+		})
+		.catch (function (error) {
+			console.log(error);
+		});
+	} else {
+		console.log('======== Current session had no token available.')
+		res.redirect('/login')
+	}
+	
 });
 
 //Approve or Reject Savings Account
 app.get('/changeSavingsAccountStatus', (req,res) => {
 	console.log("/changeSavingsAccountStatus");
 	const service = process.env.APPROVAL_SERVICE_URL + '/approval-flow/account/savings/status';
-	//const service = "uth.containers.appdomain.cloud/approval-flow/account/savings/status";
 	let params = '?user_id=' + req.query.user_id + '&last_name=' + req.query.last_name + '&first_name=' + req.query.first_name + '&mobile_no=' + req.query.mobile_no + '&email_id=' + req.query.email_id + '&status='+ req.query.status;
 	let approval_url = service + params;
-	// console.log(req.query.status);
-	axios.get(approval_url)
-	.then( function (response) {
-		console.log("Request is completed successfully");
-		res.json({"Message":"Request is completed successfully"});
-	})
-	.catch (function (error) {
-		console.log(error);
-		res.json({"Error message" :"Request to change Savings Account status - Failed! Internal Server Error."});
-	});
+	
+	if(req.session.token) {	
+		var token = 'Bearer ' + req.session.token["access_token"];
+		var config = {
+			method: 'get',
+			url: approval_url,
+			headers: { 
+			  'Authorization': token
+			}
+		  };
+		axios(config)
+		.then( function (response) {
+			console.log("Request is completed successfully");
+			res.json({"Message":"Request is completed successfully"});
+		})
+		.catch (function (error) {
+			console.log(error);
+			res.json({"Error message" :"Request to change Savings Account status - Failed! Internal Server Error."});
+		});
+	} else {
+		console.log('======== Current session had no token available.')
+		res.redirect('/login')
+	}
 });
 
 //Pending list of loan accounts
-// http://approval-service-approval-proj.cp4i-errortest-dal10-c3-f2c6cdc6801be85fd188b09d006f13e3-0000.us-south.containers.appdomain.cloud/approval-flow/account/loan/pendinglist
 app.get('/pendingLoanAccounts', (req, res) => {
 	console.log("/pendingLoanAccounts");
 	const URL = process.env.APPROVAL_SERVICE_URL + '/approval-flow/account/loan/pendinglist';
-	axios.get(URL)
-	.then( function (response) {
-		// console.log(response.data);
-		res.send(response.data);
-	})
-	.catch (function (error) {
-		console.log(error);
-	});
+	if(req.session.token) {	
+		var token = 'Bearer ' + req.session.token["access_token"];
+		var config = {
+			method: 'get',
+			url: URL,
+			headers: { 
+			  'Authorization': token
+			}
+		  };
+		axios(config)
+		.then( function (response) {
+			// console.log(response.data);
+			res.send(response.data);
+		})
+		.catch (function (error) {
+			console.log(error);
+		});
+	} else {
+		console.log('======== Current session had no token available.')
+		res.redirect('/login')
+	}
 });
 
 //Approve or Reject Loan Account
@@ -160,58 +175,89 @@ app.get('/changeLoanAccountStatus', (req,res) => {
 	const service = process.env.APPROVAL_SERVICE_URL + "/approval-flow/account/loan/status";
 	let params = '?user_id=' + req.query.user_id + '&status=' + req.query.status + '&approver_id=loan_official';
 	let approval_url = service + params;
-	// console.log(req.query.status);
-	axios.get(approval_url)
-	.then( function (response) {
-		console.log("Request is completed successfully");
-		res.json({"Message":"Request is completed successfully"});
-	})
-	.catch (function (error) {
-		console.log(error);
-		res.json({"Error message" :"Request to change Loan Account status - Failed! Internal Server Error."});
-	});
+	
+	if(req.session.token) {	
+		var token = 'Bearer ' + req.session.token["access_token"];
+		var config = {
+			method: 'get',
+			url: approval_url,
+			headers: { 
+			  'Authorization': token
+			}
+		  };
+		axios(config)
+		.then( function (response) {
+			console.log("Request is completed successfully");
+			res.json({"Message":"Request is completed successfully"});
+		})
+		.catch (function (error) {
+			console.log(error);
+			res.json({"Error message" :"Request to change Loan Account status - Failed! Internal Server Error."});
+		});
+	} else {
+		console.log('======== Current session had no token available.')
+		res.redirect('/login')
+	}
 });
 
 //Get User Dashboard Details
 app.get('/getUserDashboard', (req, res) => {
 	console.log("/getUserDashboard");
-	authClient.userInfo(req.session.token)
+	if(req.session.token) {
+		//  var token = 'Bearer ' + "teststring";
+		var token = 'Bearer ' + req.session.token["access_token"];
+		// .toString('base64');
+			
+		authClient.userInfo(req.session.token)
 		.then((response) => {
 				let userid = response.response.preferred_username;
 				// console.log(userid);
 				let url = process.env.SAVINGS_ACCOUNT_SERVICE_URL + '/locker/savings?userid=' + userid;
-					axios.get(url)
+				var config = {
+					method: 'get',
+					url: url,
+					headers: { 
+					  'Authorization': token
+					}
+				  };
+				
+				axios(config)
 					.then( function (response) {
 						console.log(response.data);
 						res.send(response.data);
 					})
 					.catch (function (error) {
 						console.log(error);
+						res.redirect('/');
 					});
 		}).catch((err) => {
 			res.json(err);
 		});
-	// let savingsAccUrl="http://savings-acc-svc-savings-project.cp4i-errortest-dal10-c3-f2c6cdc6801be85fd188b09d006f13e3-0000.us-south.containers.appdomain.cloud/locker/savings";
-    // let url = process.env.SAVINGS_ACCOUNT_SERVICE_URL + '?userid=T1U1';
-	// axios.get(url)
-	// .then( function (response) {
-	// 	console.log(response.data);
-	// 	res.send(response.data);
-	// })
-	// .catch (function (error) {
-	// 	console.log(error);
-	// });
+	} else {
+		console.log('======== Current session had no token available.');
+		res.redirect('/');
+	}
 });
 
 //Get Loan Account Details
 app.get('/getLoanAccountDetails', (req, res) => {
 	console.log("/getLoanAccountDetails");
-	authClient.userInfo(req.session.token)
+	if(req.session.token) {
+		var token = 'Bearer ' + req.session.token["access_token"];
+		
+		authClient.userInfo(req.session.token)
 		.then((response) => {
 				let userid = response.response.preferred_username;
-				console.log(userid);
+				
 				let url = process.env.LOAN_ACCOUNT_SERVICE_URL + '/locker/loan?userid=' + userid;
-				axios.get(url)
+				var config = {
+					method: 'get',
+					url: url,
+					headers: { 
+					  'Authorization': token
+					}
+				  };
+				axios(config)
 					.then( function (response) {
 						console.log(response.data);
 						res.send(response.data);
@@ -222,33 +268,26 @@ app.get('/getLoanAccountDetails', (req, res) => {
 		}).catch((err) => {
 			res.json(err);
 		});
-	// let loanAccUrl="http://loan-acc-svc-loan-project.cp4i-errortest-dal10-c3-f2c6cdc6801be85fd188b09d006f13e3-0000.us-south.containers.appdomain.cloud/locker/loan";
-    // let url = process.env.LOAN_ACCOUNT_SERVICE_URL + '?userid=T1U1';
-	// axios.get(url)
-	// .then( function (response) {
-	// 	console.log(response.data);
-	// 	res.send(response.data);
-	// })
-	// .catch (function (error) {
-	// 	console.log(error);
-	// });
+	} else {
+		console.log('======== Current session had no token available.')
+		res.redirect('/login')
+	}
 });
 
-app.get('/getDocument', (req,res) => {
-	console.log("/getDocument");
-	// http://doc-access-service-document-access.cp4i-errortest-dal10-c3-f2c6cdc6801be85fd188b09d006f13e3-0000.us-south.containers.appdomain.cloud/getFile/sm-nationalid.png
-	let svcUrl="http://doc-access-service-document-access.cp4i-errortest-dal10-c3-f2c6cdc6801be85fd188b09d006f13e3-0000.us-south.containers.appdomain.cloud/getFile/";
-    let url = svcUrl + req.query.file;
-	res.download(url);
-	// axios.get(url)
-	// .then( function (response) {
-	// 	console.log(response.data);
-	// 	res.send(response.data);
-	// })
-	// .catch (function (error) {
-	// 	console.log(error);
-	// });
-});
+// app.get('/getDocument', (req,res) => {
+// 	console.log("/getDocument");
+// 	let svcUrl="http://doc-access-service-xxxx/getFile/";
+//     let url = svcUrl + req.query.file;
+// 	res.download(url);
+// 	// axios.get(url)
+// 	// .then( function (response) {
+// 	// 	console.log(response.data);
+// 	// 	res.send(response.data);
+// 	// })
+// 	// .catch (function (error) {
+// 	// 	console.log(error);
+// 	// });
+// });
 
 // serve the react app files
 app.use(express.static(`${__dirname}/ui-react/build`));
@@ -258,11 +297,7 @@ app.get('*', (req,res) =>{
     res.sendFile(path.join(__dirname+'/ui-react/build/index.html'));
 });  
 
-// Serve static resources
-// app.use(express.static('./public'));
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
-// app.use(upload.array("files")); 
+// Multer configuration
 const multerStorage = multer.diskStorage({
 	destination: function(req, file, cb) {
 		cb(null, 'uploads/');
@@ -279,10 +314,7 @@ app.use(upload.any());
 // Create Savings Account 
 app.post("/createSavingsAccount", async (req, res) => {
     console.log("/createSavingsAccount-POST API");
-	// console.log(req.headers);
-	// console.log(req.headers['content-type']);
 	console.log(req.body);
-	// console.log(req.body['userid']);
 	console.log(req.files);
 
 	var data = new FormData();
@@ -296,16 +328,8 @@ app.post("/createSavingsAccount", async (req, res) => {
 	data.append('nationalidfile', fs.createReadStream('./uploads/nationalidfile.png'));
 	// data.append('nationalidfile', request('http://nodejs.org/images/logo.png'));
 	
-	// // req.headers['content-type']
-    // // call java service
-	// // const headers = {
-	// // 	'Content-Type': 'multipart/form-data'
-	// //   }
-	// // const response = await axios.post(
-	// // 	"http://savings-acc-svc-savings-project.cp4i-errortest-dal10-c3-f2c6cdc6801be85fd188b09d006f13e3-0000.us-south.containers.appdomain.cloud/locker/savings", 
-	// // 	data, {headers: headers})
 	const URL = process.env.SAVINGS_ACCOUNT_SERVICE_URL+'/locker/savings';
-	// console.log(URL);
+	
 	var config = {
 		method: 'post',
 		url: URL,
@@ -331,7 +355,7 @@ app.post("/createLoanAccount", async (req, res) => {
     console.log("/createLoanAccount-POST API");
 	console.log(req.body);
 	console.log(req.files);
-
+	
 	var data = new FormData();
     data.append('userid', req.body['userid']);
     data.append('income', req.body['income']);
@@ -339,25 +363,33 @@ app.post("/createLoanAccount", async (req, res) => {
 	data.append('loan_amount', req.body['loan_amount']);
 	data.append('incomeprooffile', fs.createReadStream('./uploads/incomeprooffile.png'));
 	
-	const URL = process.env.LOAN_ACCOUNT_SERVICE_URL+'/locker/loan';
-	var config = {
-		method: 'post',
-		url: URL,
-		headers: {  
-			...data.getHeaders()
-		},
-		data : data
-	  };
+	if (req.session.token) {
+		var token = 'Bearer ' + req.session.token["access_token"];
+	
+		const URL = process.env.LOAN_ACCOUNT_SERVICE_URL+'/locker/loan';
+		var config = {
+			method: 'post',
+			url: URL,
+			headers: {  
+				'Authorization': token,
+				...data.getHeaders()
+			},
+			data : data
+		};
 	  
-	  axios(config)
-	  .then(function (response) {
-		console.log(JSON.stringify(response.data));
-		res.json({"Message" : "Loan request has been submitted successfully"});
-	  })
-	  .catch(function (error) {
-		console.log(error);
-		res.json({"Message" : "Error in creating Loan request. Internal Server Error."});
-	  });
+		axios(config)
+			.then(function (response) {
+				console.log(JSON.stringify(response.data));
+				res.json({"Message" : "Loan request has been submitted successfully"});
+		})
+			.catch(function (error) {
+				console.log(error);
+				res.json({"Message" : "Error in creating Loan request. Internal Server Error."});
+		});
+	} else {
+		console.log('======== Current session had no token available.')
+		res.redirect('/login')
+	}
 });
 
 
