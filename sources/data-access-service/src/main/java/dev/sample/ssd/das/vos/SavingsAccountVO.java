@@ -8,7 +8,6 @@ import org.json.simple.JSONObject;
 
 import dev.sample.ssd.das.utils.OperationType;
 
-
 public class SavingsAccountVO {
 
 	private String userid;
@@ -31,7 +30,6 @@ public class SavingsAccountVO {
 	private String optionalValidationMessage;
 	private String opType;
 	private String hasLoan;
-	
 
 	public String getUserid() {
 		return userid;
@@ -184,8 +182,6 @@ public class SavingsAccountVO {
 	public void setOptionalValidationMessage(String optionalValidationMessage) {
 		this.optionalValidationMessage = optionalValidationMessage;
 	}
-	
-	
 
 	public String getHasLoan() {
 		return hasLoan;
@@ -195,132 +191,130 @@ public class SavingsAccountVO {
 		this.hasLoan = hasLoan;
 	}
 
-	public SavingsAccountVO(){
-		
+	public SavingsAccountVO() {
+
 	}
 
-	public SavingsAccountVO(HashMap<String, String> payload, String opType) throws Exception{
+	public SavingsAccountVO(HashMap<String, String> payload, String opType) throws Exception {
 		this.mandatoryValidationMessage = "";
 		this.optionalValidationMessage = "";
 		this.setOpType(opType);
-		
-    	String key = (String)payload.get("user_id");
-    	if( key == null ) {
-    		setUserid("");
-    	}else {
-    		setUserid(key);
-    	}
-    	
-    	key = (String)payload.get("savings_account_no");
-    	if( key == null ) {
-    		setUserid("");
-    	}else {
-    		setUserid(key);
-    	}
 
-    	key = (String)payload.get("first_name");
-    	if( key == null ) {
-    		setFirstName("");
-    	}else {
-    		setFirstName(key);
-    	}
+		String key = (String) payload.get("user_id");
+		if (key == null) {
+			setUserid("");
+		} else {
+			setUserid(key);
+		}
 
-    	key = (String)payload.get("last_name");
-    	if( key == null ) {
-    		setLastName("");
-    	}else {
-    		setLastName(key);
-    	}
+		key = (String) payload.get("savings_account_no");
+		if (key == null) {
+			setUserid("");
+		} else {
+			setUserid(key);
+		}
 
-    	key = (String)payload.get("mobile_no");
-    	if( key == null ) {
-    		setMobileNo("");
-    	}else {
-    		setMobileNo(key);
-    	}
+		key = (String) payload.get("first_name");
+		if (key == null) {
+			setFirstName("");
+		} else {
+			setFirstName(key);
+		}
 
-    	key = (String)payload.get("address");
-    	if( key == null ) {
-    		setAddress("");
-    	}else {
-    		setAddress(key);
-    	}
+		key = (String) payload.get("last_name");
+		if (key == null) {
+			setLastName("");
+		} else {
+			setLastName(key);
+		}
 
-    	key = (String)payload.get("national_id");
-    	if( key == null ) {
-    		setNationalId("");
-    	}else {
-    		setNationalId(key);
-    	}
+		key = (String) payload.get("mobile_no");
+		if (key == null) {
+			setMobileNo("");
+		} else {
+			setMobileNo(key);
+		}
 
-    	key = (String)payload.get("tax_id");
-    	if( key == null ) {
-    		setTaxId("");
-    	}else {
-    		setTaxId(key);
-    	}
+		key = (String) payload.get("address");
+		if (key == null) {
+			setAddress("");
+		} else {
+			setAddress(key);
+		}
 
-    	key = (String)payload.get("email_id");
-    	if( key == null ) {
-    		setEmailId("");
-    	}else {
-    		setEmailId(key);
-    	}
+		key = (String) payload.get("national_id");
+		if (key == null) {
+			setNationalId("");
+		} else {
+			setNationalId(key);
+		}
 
-    	key = (String)payload.get("income");
-    	if( key == null ) {
-    		setIncome("");
-    	}else {
-    		setIncome(key);
-    	}
-    	
-    	key = (String)payload.get("status");
-    	if( key == null ) {
-        	if( this.opType == OperationType.updateSA ) {
-        		this.mandatoryValidationMessage = this.mandatoryValidationMessage + "Status is not provided. ";
-        	}
-    		setStatus("");
-    	}else {
-    		setStatus(key);
-    	}
-    	
-    	key = (String)payload.get("approver_id");
-    	if( key == null ) {
-    		setApproverId("");
-    	}else {
-    		setApproverId(key);
-    	}
+		key = (String) payload.get("tax_id");
+		if (key == null) {
+			setTaxId("");
+		} else {
+			setTaxId(key);
+		}
 
-    	key = (String)payload.get("account_balance");
-    	if( key == null ) {
-    		setAccountBalance("");
-    	}else {
-    		setAccountBalance(key);
-    	}
-    	
-    	key = (String)payload.get("apply_date");
-    	if( key == null ) {
-    		setApplyDate("");
-    	}else {
-    		setApplyDate(key.substring(0, 10));
-    	}
-    	
-    	key = (String)payload.get("reject_reason");
-    	if( key == null ) {
-    		setRejectReason("");
-    	}else {
-    		setRejectReason(key);
-    	}
-    	
-    	if( this.mandatoryValidationMessage.length() > 0 ) {
-    		throw new Exception(this.mandatoryValidationMessage);
-    	}
-    	
+		key = (String) payload.get("email_id");
+		if (key == null) {
+			setEmailId("");
+		} else {
+			setEmailId(key);
+		}
+
+		key = (String) payload.get("income");
+		if (key == null) {
+			setIncome("");
+		} else {
+			setIncome(key);
+		}
+
+		key = (String) payload.get("status");
+		if (key == null) {
+			if (this.opType == OperationType.updateSA) {
+				this.mandatoryValidationMessage = this.mandatoryValidationMessage + "Status is not provided. ";
+			}
+			setStatus("");
+		} else {
+			setStatus(key);
+		}
+
+		key = (String) payload.get("approver_id");
+		if (key == null) {
+			setApproverId("");
+		} else {
+			setApproverId(key);
+		}
+
+		key = (String) payload.get("account_balance");
+		if (key == null) {
+			setAccountBalance("");
+		} else {
+			setAccountBalance(key);
+		}
+
+		key = (String) payload.get("apply_date");
+		if (key == null || key.isEmpty()) {
+			setApplyDate("");
+		} else {
+			setApplyDate(key.substring(0, 10));
+		}
+
+		key = (String) payload.get("reject_reason");
+		if (key == null) {
+			setRejectReason("");
+		} else {
+			setRejectReason(key);
+		}
+
+		if (this.mandatoryValidationMessage.length() > 0) {
+			throw new Exception(this.mandatoryValidationMessage);
+		}
+
 	}
-	
 
-	public JSONObject toJSON(){
-		
+	public JSONObject toJSON() {
 
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("user_id", this.userid);
@@ -337,16 +331,16 @@ public class SavingsAccountVO {
 		jsonObject.put("approver_id", this.approverId);
 		jsonObject.put("accoun_balance", this.accountBalance);
 		jsonObject.put("apply_date", this.applyDate != null ? this.applyDate.substring(0, 10) : "");
-		jsonObject.put("approve_or_reject_date", this.approveOrRejectDate != null ? this.approveOrRejectDate.substring(0, 10) : "");
+		jsonObject.put("approve_or_reject_date",
+				this.approveOrRejectDate != null ? this.approveOrRejectDate.substring(0, 10) : "");
 		jsonObject.put("reject_reason", this.rejectReason);
 		jsonObject.put("has_loan", this.hasLoan);
 		jsonObject.put("validation_message", this.mandatoryValidationMessage);
-		
+
 		return jsonObject;
 	}
-	
-	
-	public void setValues(ResultSet rs) throws Exception{
+
+	public void setValues(ResultSet rs) throws Exception {
 		this.setUserid(rs.getString("user_id"));
 		try {
 			this.setFirstName(rs.getString("first_name"));
@@ -364,7 +358,7 @@ public class SavingsAccountVO {
 			// Continue.. this field may not be retrieved from database
 		}
 		try {
-			this.setMobileNo(rs.getLong("mobile_no")+"");
+			this.setMobileNo(rs.getLong("mobile_no") + "");
 		} catch (SQLException e) {
 			// Continue.. this field may not be retrieved from database
 		}
@@ -389,18 +383,18 @@ public class SavingsAccountVO {
 			// Continue.. this field may not be retrieved from database
 		}
 		try {
-			this.setIncome(rs.getDouble("income")+"");
+			this.setIncome(rs.getDouble("income") + "");
 		} catch (SQLException e) {
 			// Continue.. this field may not be retrieved from database
 		}
-		
+
 		try {
 			this.setStatus(rs.getString("status"));
 		} catch (SQLException e) {
 			// Continue.. this field may not be retrieved from database
 		}
 		try {
-			this.setAccountBalance(rs.getDouble("account_balance")+"");
+			this.setAccountBalance(rs.getDouble("account_balance") + "");
 		} catch (SQLException e) {
 			// Continue.. this field may not be retrieved from database
 		}

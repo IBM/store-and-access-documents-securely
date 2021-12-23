@@ -129,11 +129,11 @@ Get the root key CRN value using IBM Cloud Dashboard. You can refer to step 5 [h
   - For the Application URL, enter the URL you noted for the front end UI application
   - For the Grant types, check Authorization code.
   - Uncheck Require proof key for code exchange (PKCE) verification.
-  - For Redirect URIs, enter the re-direct URL
+  - For Redirect URIs, enter the re-direct URL on the front end application. 
   - Click Save to save this SSO configuration.
 ![Configure SSO](./images/configure-sso.png)
 - Click the Entitlements tab. For the Access Type, select Automatic access for all users and groups. Click Save to save the custom application.
-- Click the Sign-on tab. Note down the **client ID and the client secret**.
+- Click the Sign-on tab. Note down the **client ID and the client secret**. This is needed for configuring the front-end gateway service.
 
 **Note Security Verify endpoints**
 In the far right information pane, note down the IBM Security Verify endpoint.
@@ -142,6 +142,11 @@ In the far right information pane, note down the IBM Security Verify endpoint.
 
 Then, note down the following endpoints: **authorization_endpoint, token_endpoint and introspection_endpoint**. These will be needed to configure our application microservices to integrate with Security Verify.
 
+**Note profile id**
+Note the profile id.It is needed in configuring the front-end gateway service.
+
+![profile-id](./images/profile_id.png).
+
 **Add an API Client**
 - Click on the `API Access` tab on application settings
 - Click on `Add API Client` button
@@ -149,7 +154,7 @@ Then, note down the following endpoints: **authorization_endpoint, token_endpoin
 - Again click `Save` on the parent settings page. The credentials will now be generated.
 
 ![Save API Client](./images/save-api-client.png)
-- Select the added `API Client`. On the right pane, the generated credentials can be copied. Make a note of the credentials. They will be needed for the `Approval service` configuration.
+- Select the added `API Client`. On the right pane, the generated credentials can be copied. Make a note of the credentials. They will be needed for the `Approval service` configuration. Also note that this is different from the `client-id` and `client-secret` we noted when you created the SSO configuration. 
 
 ![Note API Client credentials](./images/note-api-client-credentials.png)
 
@@ -166,6 +171,8 @@ Enter the user details as shown for user `savings_official`. Enter a valid e-mai
 ![Enter user details](./images/enter-user-details.png)
 
 Repeat the above steps to create a user for `loan_official`.
+
+>Note: The same e-mail id can be used for both the users.
 
 #### 3.3 Configure DB2 database
 
@@ -239,7 +246,7 @@ Run the API `http://<your_service_route>/create-bucket-kp` on your browser to cr
 Approval Service accesses Data Access Service. So, you need to update the file `<cloned repo parent folder>/sources/approval-service/src/main/resources/config/config.properties`. Update the entry `DAS_BASE_URL` to `http://<data-access-service-route>/DAS/` as noted in [section 4.1](#41-deploy-data-access-service).
 
 Enter the `introspection_endpoint` url noted in the `Note Security Verify endpoints` section above.
-Enter the `client_id` and `client_secret` noted in the `Add a custom application` section above.
+Enter the `client_id` and `client_secret` noted in the `Add an API Client` section above.
 ```
 TOKEN_URL=https://{{tenant_id}}.verify.ibm.com/v1.0/endpoint/default/introspect
 CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -342,8 +349,20 @@ cd <cloned repo parent folder>/sources/frontend-service
 cp .env.sample .env
 ```
 
-Update the security verify credentials and other deployed microservices URL in `.env`.
->Note: REDIRECT_URI should be `<your deployed application route>/redirect`.
+Update the security verify credentials and other deployed microservices URL in `.env`. The `client-id` and `client-secret` should be the one noted in the `Add a custom application` section. The `profile-id` noted earlier must be entered against the `REGISTRATION_PROFILE_ID`. 
+
+```
+TENANT_URL=https://[tenant-id].verify.ibm.com
+CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+CLIENT_SECRET=xxxxxxxxxx
+REDIRECT_URI=http://[your deployed application route]/redirect
+RESPONSE_TYPE=code
+FLOW_TYPE=authorization
+SCOPE=openid
+REGISTRATION_PROFILE_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+~                                                            
+```
+>Note: REDIRECT_URI should be `<your deployed application route>/redirect`. The base URL of the deployedfront-end service must be replaced for the `REDIRECT_URI`. The `REDIRECT_URI` must match the configuration on `Security Verify` that you specified in `Add a custom application` section.
 
 Run the following commands to deploy `frontend-service` after logging into the OpenShift cluster from command line. .
 
