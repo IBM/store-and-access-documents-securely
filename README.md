@@ -364,7 +364,15 @@ REGISTRATION_PROFILE_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 >Note: REDIRECT_URI should be `<your deployed application route>/redirect`. The base URL of the deployedfront-end service must be replaced for the `REDIRECT_URI`. The `REDIRECT_URI` must match the configuration on `Security Verify` that you specified in `Add a custom application` section.
 
-Run the following commands to deploy `frontend-service` after logging into the OpenShift cluster from command line. .
+Update the URLs of the deployed services in `.env`.
+
+```
+APPROVAL_SERVICE_URL=
+LOAN_ACCOUNT_SERVICE_URL=
+SAVINGS_ACCOUNT_SERVICE_URL=
+```
+
+After making all the required changes in `.env`, you are good to deploy frontnd service. Login to the OpenShift cluster from the command line and then run the following commands to deploy `frontend-service`.
 
 ```
   oc new-project frontend-svc
