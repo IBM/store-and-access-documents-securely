@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -23,6 +24,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 public class AuthFilter implements Filter {
 
@@ -49,8 +51,16 @@ public class AuthFilter implements Filter {
 		if (authorizationHeaderValue != null && authorizationHeaderValue.startsWith("Bearer")) {
 			token = authorizationHeaderValue.substring(7, authorizationHeaderValue.length());
 		}
-		if (token == null)
+
+		HttpServletResponse resp = (HttpServletResponse) response;
+		boolean isValidRequest = true;
+
+		logger.log(Level.INFO, "Http Request method:" + ((HttpServletRequest) request).getMethod());
+		if (token == null && ((HttpServletRequest) request).getMethod().equalsIgnoreCase("GET")) {
 			logger.log(Level.SEVERE, "No token found!");
+			isValidRequest = false;
+		}
+
 
 		if (token != null) {
 			HttpPost post = new HttpPost(props.getProperty("introspectionUrl"));
@@ -65,10 +75,23 @@ public class AuthFilter implements Filter {
 					CloseableHttpResponse res = httpClient.execute(post)) {
 				result = EntityUtils.toString(res.getEntity());
 				logger.log(Level.INFO, "Token introspection results:" + result);
+				logger.log(Level.INFO, "Http Request method:" + ((HttpServletRequest) request).getMethod());
+				if (((HttpServletRequest) request).getMethod().equalsIgnoreCase("GET")) {
+					logger.log(Level.INFO, "Inside GET condition");
+					JSONObject tokenIntro = new JSONObject(result);
+					if (tokenIntro.getBoolean("active") == false) {
+						isValidRequest = false;
+					}
+				}
 			}
-		}
 
-		chain.doFilter(request, response);
+		}
+		if (isValidRequest)
+			chain.doFilter(request, response);
+		else {
+			resp.setStatus(401);
+			resp.getWriter().print("401 - Unauthorized request");
+		}
 	}
 
 }
