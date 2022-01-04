@@ -3,6 +3,23 @@
     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
     version="3.1">
     <display-name>Liberty Project</display-name>
+    <servlet>
+		<servlet-name>com.example.approval.flow.ApprovalFlowController</servlet-name>
+    </servlet>
+
+    <servlet-mapping>
+		<servlet-name>com.example.approval.flow.ApprovalFlowController</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+    <filter>
+		<filter-name>AuthFilter</filter-name>
+		<filter-class>com.example.approval.flow.AuthFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
